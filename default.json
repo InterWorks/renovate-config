@@ -5,5 +5,13 @@
     "mergeConfidence:all-badges",
     ":semanticCommits"
   ],
-  "minimumReleaseAge": "7 days"
+  "minimumReleaseAge": "7 days",
+  "packageRules": [
+    {
+      "description": "Internal Claude/Themis reusable workflows live in InterWorks/CuratorAgents and intentionally track @main -- don't pin digests or update them, callers are meant to follow main.",
+      "matchManagers": ["github-actions"],
+      "matchDepNames": ["InterWorks/CuratorAgents"],
+      "enabled": false
+    }
+  ]
 }
