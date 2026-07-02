@@ -11,6 +11,11 @@
       "description": "Enforce the 7-day cooldown for npm too. config:best-practices bundles security:minimumReleaseAgeNpm, a packageRule setting minimumReleaseAge to 3 days for npm, which otherwise overrides the top-level 7 days for every npm dependency.",
       "matchDatasources": ["npm"],
       "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Group the Vite ecosystem into a single PR. @vitejs/plugin-react@6.x requires vite@^8.0.0 and vitest@4.x is needed for Vite 8 support — splitting these causes ERESOLVE peer dep conflicts.",
+      "matchPackageNames": ["/^vite$/", "/^vite-/", "/^@vitejs\\//", "/^vitest$/"],
+      "groupName": "vite ecosystem"
     }
   ]
 }
