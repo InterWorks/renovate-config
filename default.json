@@ -11,6 +11,11 @@
       "description": "Enforce the 7-day cooldown for npm too. config:best-practices bundles security:minimumReleaseAgeNpm, a packageRule setting minimumReleaseAge to 3 days for npm, which otherwise overrides the top-level 7 days for every npm dependency.",
       "matchDatasources": ["npm"],
       "minimumReleaseAge": "7 days"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["digest"],
+      "minimumReleaseAge": "7 days"
     }
   ]
 }
