@@ -1,16 +1,20 @@
 name: Check npm/cli#9800
 
-# Passes while npm/cli#9800 reproduces. Failing means either the fix shipped in
-# npm (check Renovate's runner before removing the workaround) or the probe broke.
+# Probes whether npm/cli#9800 still reproduces, i.e. whether the allow-remote=all
+# workaround in default.json is still needed. Never blocks PRs: on a PR it posts a
+# comment mentioning CODEOWNERS instead. The weekly run fails and comments on #8.
 # See https://github.com/InterWorks/renovate-config/issues/8
 
 on:
+  pull_request:
   schedule:
     - cron: '0 9 * * 1'
   workflow_dispatch:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   probe:
@@ -21,4 +25,18 @@ jobs:
         with:
           node-version: '22'
       - run: npm install -g npm@12
-      - run: bash .github/scripts/check-npm-9800.sh
+      - id: probe
+        run: |
+          set +e
+          bash .github/scripts/check-npm-9800.sh
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+      - name: Report
+        # Fork PRs get a read-only token; don't let a failed comment block them.
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash .github/scripts/report-npm-9800.sh "${{ steps.probe.outputs.status }}"
+      - name: Fail outside PRs
+        if: github.event_name != 'pull_request' && steps.probe.outputs.status != '0'
+        run: exit 1

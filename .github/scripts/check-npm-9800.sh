@@ -9,7 +9,7 @@ ISSUE="https://github.com/InterWorks/renovate-config/issues/8"
 
 echo "npm $(npm --version)"
 dir=$(mktemp -d)
-cd "$dir"
+cd "$dir" || exit 2
 npm init -y >/dev/null
 echo "allow-remote=none" > .npmrc
 
