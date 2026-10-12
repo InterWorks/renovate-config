@@ -1,8 +1,8 @@
 name: Check npm/cli#9800
 
 # Probes whether npm/cli#9800 still reproduces, i.e. whether the allow-remote=all
-# workaround in default.json is still needed. Never blocks PRs: on a PR it posts a
-# comment mentioning CODEOWNERS instead. The weekly run fails and comments on #8.
+# workaround in default.json is still needed. Fails on every trigger once it isn't
+# (or the probe breaks), and mentions CODEOWNERS on the PR or, otherwise, on #8.
 # See https://github.com/InterWorks/renovate-config/issues/8
 
 on:
@@ -37,6 +37,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: bash .github/scripts/report-npm-9800.sh "${{ steps.probe.outputs.status }}"
-      - name: Fail outside PRs
-        if: github.event_name != 'pull_request' && steps.probe.outputs.status != '0'
+      - name: Fail
+        if: steps.probe.outputs.status != '0'
         run: exit 1
