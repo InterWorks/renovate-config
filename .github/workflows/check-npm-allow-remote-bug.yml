@@ -1,55 +1,24 @@
-name: Check npm allow-remote bug (npm/cli#9800)
+name: Check npm/cli#9800
 
-# Passes while the bug is present (workaround needed).
-# Fails once the fix ships — that's the signal to remove the workaround.
-# See README.md and https://github.com/InterWorks/renovate-config/issues/8
+# Passes while npm/cli#9800 reproduces. Failing means either the fix shipped in
+# npm (check Renovate's runner before removing the workaround) or the probe broke.
+# See https://github.com/InterWorks/renovate-config/issues/8
 
 on:
   schedule:
-    - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC
-  push:
-    branches: [main]
-  pull_request:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  check-bug:
-    name: npm/cli#9800 still present
+  probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Node.js with npm 12
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '22'  # ships with npm 10; we upgrade npm below
-      - name: Install npm 12
-        run: npm install -g npm@12
-
-      - name: Probe for EALLOWREMOTE bug
-        id: probe
-        run: |
-          TMPDIR=$(mktemp -d)
-          cd "$TMPDIR"
-          npm init -y --quiet
-
-          # Try to install the package that triggers the bug.
-          # --allow-remote=none replicates npm 12's new default.
-          # Capture output; ignore exit code here so we can inspect it.
-          OUTPUT=$(npm install @tailwindcss/oxide-wasm32-wasi --allow-remote=none 2>&1) || true
-          echo "$OUTPUT"
-
-          if echo "$OUTPUT" | grep -q 'EALLOWREMOTE'; then
-            echo "result=bug_present" >> "$GITHUB_OUTPUT"
-          else
-            echo "result=bug_fixed" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Pass — bug still present, workaround still needed
-        if: steps.probe.outputs.result == 'bug_present'
-        run: echo "npm/cli#9800 is still present. The allow-remote=all workaround in default.json is still needed."
-
-      - name: Fail — bug is fixed, remove the workaround
-        if: steps.probe.outputs.result == 'bug_fixed'
-        run: |
-          echo "::error::npm/cli#9800 appears to be fixed in this npm version."
-          echo "::error::Remove 'npmrc' and 'npmrcMerge' from default.json and the note from README.md."
-          echo "::error::See https://github.com/InterWorks/renovate-config/issues/8"
-          exit 1
+          node-version: '22'
+      - run: npm install -g npm@12
+      - run: bash .github/scripts/check-npm-9800.sh
