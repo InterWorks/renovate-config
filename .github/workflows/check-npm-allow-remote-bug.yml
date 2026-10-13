@@ -1,0 +1,25 @@
+name: Check npm/cli#9800
+
+# Fails once npm/cli#9800 stops reproducing (or the probe breaks), blocking every
+# PR until the allow-remote=all workaround in default.json is removed or replaced.
+# See https://github.com/InterWorks/renovate-config/issues/8
+
+on:
+  pull_request:
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install -g npm@12
+      - run: bash .github/scripts/check-npm-9800.sh
