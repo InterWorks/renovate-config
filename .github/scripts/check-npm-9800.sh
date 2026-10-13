@@ -22,7 +22,7 @@ if [ "$status" -ne 0 ] && grep -q "EALLOWREMOTE" <<<"$output"; then
   exit 0
 elif [ "$status" -eq 0 ]; then
   echo "::error::npm/cli#9800 no longer reproduces on npm $(npm --version)."
-  echo "::error::Before removing the workaround, confirm Renovate's hosted runner uses an npm with the fix. See $ISSUE"
+  echo "::error::Before removing the workaround, confirm our self-hosted Renovate uses an npm with the fix. See $ISSUE"
   exit 1
 else
   echo "::error::Probe failed for a reason other than EALLOWREMOTE (exit $status); this says nothing about the bug. See output above."
