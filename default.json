@@ -6,7 +6,7 @@
     ":semanticCommits"
   ],
   "minimumReleaseAge": "7 days",
-  "npmrc": "allow-remote=all",
+  "npmrc": "allow-remote=all\nmin-release-age=7",
   "npmrcMerge": true,
   "packageRules": [
     {
